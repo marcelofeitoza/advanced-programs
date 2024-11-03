@@ -6,5 +6,5 @@ pub enum FundraiserError {
     MaximumContributionsReached,
     FundraiserNotEnded,
     FundraiserEnded,
-    InvalidAmount
+    InvalidAmount,
 }

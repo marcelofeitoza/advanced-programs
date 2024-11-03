@@ -1,6 +1,6 @@
 use pinocchio::account_info::AccountInfo;
-use pinocchio::entrypoint::ProgramResult;
+use pinocchio::ProgramResult;
 
-pub fn process_contribute_instruction(accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
+pub fn process_contribute_instruction(_accounts: &[AccountInfo], _data: &[u8]) -> ProgramResult {
     Ok(())
 }

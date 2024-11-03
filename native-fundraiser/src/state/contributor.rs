@@ -1,6 +1,6 @@
 use pinocchio::account_info::AccountInfo;
-use pinocchio::ProgramResult;
 use pinocchio::program_error::ProgramError;
+use pinocchio::ProgramResult;
 
 pub struct Contributor(*mut u8);
 

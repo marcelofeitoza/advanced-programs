@@ -1,9 +1,9 @@
+use crate::instructions::{process_initialize_instruction, FundraiserInstruction};
 use five8_const::decode_32_const;
 use pinocchio::account_info::AccountInfo;
-use pinocchio::{entrypoint, ProgramResult};
 use pinocchio::program_error::ProgramError;
 use pinocchio::pubkey::Pubkey;
-use crate::instructions::{process_check_contributions_instruction, process_contribute_instruction, process_initialize_instruction, process_refund_instruction, FundraiserInstruction};
+use pinocchio::{entrypoint, ProgramResult};
 
 mod constants;
 mod errors;
@@ -23,13 +23,17 @@ pub fn process_instruction(
         return Err(ProgramError::IncorrectProgramId);
     }
 
-    let (instruction_discrimnant, restinstruction_inner_data) = data.split_first().ok_or(ProgramError::InvalidInstructionData)?;
+    let (instruction_discrimnant, restinstruction_inner_data) = data
+        .split_first()
+        .ok_or(ProgramError::InvalidInstructionData)?;
 
     match FundraiserInstruction::try_from(instruction_discrimnant)? {
-        FundraiserInstruction::InitializeInstruction => process_initialize_instruction(accounts, restinstruction_inner_data)?,
-        FundraiserInstruction::ContributeInstruction => process_contribute_instruction(accounts, restinstruction_inner_data)?,
-        FundraiserInstruction::CheckContributionsInstruction => process_check_contributions_instruction(accounts, restinstruction_inner_data)?,
-        FundraiserInstruction::RefundInstruction => process_refund_instruction(accounts, restinstruction_inner_data)?,
+        FundraiserInstruction::InitializeInstruction => {
+            process_initialize_instruction(accounts, restinstruction_inner_data)?
+        }
+        FundraiserInstruction::ContributeInstruction => return Ok(()),
+        FundraiserInstruction::CheckContributionsInstruction => return Ok(()),
+        FundraiserInstruction::RefundInstruction => return Ok(()),
     }
 
     Ok(())

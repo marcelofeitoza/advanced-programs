@@ -1,7 +1,7 @@
 use pinocchio::account_info::AccountInfo;
-use pinocchio::ProgramResult;
 use pinocchio::program_error::ProgramError;
 use pinocchio::pubkey::Pubkey;
+use pinocchio::ProgramResult;
 
 pub struct Fundraiser(*mut u8);
 
@@ -31,11 +31,25 @@ impl Fundraiser {
         Ok(Self::from_account_info_unchecked(account_info))
     }
 
-    pub fn maker(&self) -> Pubkey { unsafe { *(self.0 as *const Pubkey) } }
-    pub fn mint_to_raise(&self) -> Pubkey { unsafe { *(self.0.add(32) as *const Pubkey) } }
-    pub fn amount_to_raise(&self) -> u64 { unsafe { *(self.0.add(64) as *const u64) } }
-    pub fn current_amount(&self) -> u64 { unsafe { *(self.0.add(72) as *const u64) } }
-    pub fn time_started(&self) -> i64 { unsafe { *(self.0.add(80) as *const i64) } }
-    pub fn duration(&self) -> u8 { unsafe { *(self.0.add(88) as *const u8) } }
-    pub fn bump(&self) -> u8 { unsafe { *(self.0.add(89) as *const u8) } }
+    pub fn maker(&self) -> Pubkey {
+        unsafe { *(self.0 as *const Pubkey) }
+    }
+    pub fn mint_to_raise(&self) -> Pubkey {
+        unsafe { *(self.0.add(32) as *const Pubkey) }
+    }
+    pub fn amount_to_raise(&self) -> u64 {
+        unsafe { *(self.0.add(64) as *const u64) }
+    }
+    pub fn current_amount(&self) -> u64 {
+        unsafe { *(self.0.add(72) as *const u64) }
+    }
+    pub fn time_started(&self) -> i64 {
+        unsafe { *(self.0.add(80) as *const i64) }
+    }
+    pub fn duration(&self) -> u8 {
+        unsafe { *(self.0.add(88) as *const u8) }
+    }
+    pub fn bump(&self) -> u8 {
+        unsafe { *(self.0.add(89) as *const u8) }
+    }
 }
