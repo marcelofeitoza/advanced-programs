@@ -6,6 +6,7 @@ use pinocchio::ProgramResult;
 pub struct Fundraiser(*mut u8);
 
 impl Fundraiser {
+    // Total = 32 + 32 + 8 + 8 + 8 + 1 + 1 = 90
     pub const LEN: usize = 32 // maker
         + 32 // mint_to_raise
         + 8  // amount_to_raise
@@ -32,13 +33,13 @@ impl Fundraiser {
     }
 
     pub fn maker(&self) -> Pubkey {
-        unsafe { *(self.0 as *const Pubkey) }
+        unsafe { *(self.0 as *const Pubkey) } // 0 - 32
     }
     pub fn mint_to_raise(&self) -> Pubkey {
-        unsafe { *(self.0.add(32) as *const Pubkey) }
+        unsafe { *(self.0.add(32) as *const Pubkey) } // 32 - 64
     }
     pub fn amount_to_raise(&self) -> u64 {
-        unsafe { *(self.0.add(64) as *const u64) }
+        unsafe { *(self.0.add(64) as *const u64) } // 64 - 72
     }
     pub fn current_amount(&self) -> u64 {
         unsafe { *(self.0.add(72) as *const u64) }

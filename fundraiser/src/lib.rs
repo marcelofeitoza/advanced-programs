@@ -9,6 +9,7 @@ mod constants;
 mod errors;
 mod instructions;
 mod state;
+mod tests;
 
 const ID: [u8; 32] = decode_32_const("22222222222222222222222222222222222222222222");
 

@@ -20,6 +20,7 @@ pub enum FundraiserInstruction {
 
 impl TryFrom<&u8> for FundraiserInstruction {
     type Error = ProgramError;
+
     fn try_from(instruction: &u8) -> Result<Self, ProgramError> {
         match instruction {
             0 => Ok(Self::InitializeInstruction),
