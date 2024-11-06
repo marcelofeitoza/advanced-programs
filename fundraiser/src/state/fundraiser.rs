@@ -42,15 +42,15 @@ impl Fundraiser {
         unsafe { *(self.0.add(64) as *const u64) } // 64 - 72
     }
     pub fn current_amount(&self) -> u64 {
-        unsafe { *(self.0.add(72) as *const u64) }
+        unsafe { *(self.0.add(72) as *const u64) } // 72 - 80
     }
     pub fn time_started(&self) -> i64 {
-        unsafe { *(self.0.add(80) as *const i64) }
+        unsafe { *(self.0.add(80) as *const i64) } // 80 - 88
     }
     pub fn duration(&self) -> u8 {
-        unsafe { *(self.0.add(88) as *const u8) }
+        unsafe { *(self.0.add(88) as *const u8) } // 88 - 89
     }
     pub fn bump(&self) -> u8 {
-        unsafe { *(self.0.add(89) as *const u8) }
+        unsafe { *(self.0.add(89) as *const u8) } // 89 - 90
     }
 }
