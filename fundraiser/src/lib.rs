@@ -1,3 +1,4 @@
+use crate::instructions::contribute::process_contribute_instruction;
 use crate::instructions::{process_initialize_instruction, FundraiserInstruction};
 use five8_const::decode_32_const;
 use pinocchio::account_info::AccountInfo;
@@ -32,7 +33,9 @@ pub fn process_instruction(
         FundraiserInstruction::InitializeInstruction => {
             process_initialize_instruction(accounts, restinstruction_inner_data)?
         }
-        FundraiserInstruction::ContributeInstruction => return Ok(()),
+        FundraiserInstruction::ContributeInstruction => {
+            process_contribute_instruction(accounts, restinstruction_inner_data)?
+        }
         FundraiserInstruction::CheckContributionsInstruction => return Ok(()),
         FundraiserInstruction::RefundInstruction => return Ok(()),
     }

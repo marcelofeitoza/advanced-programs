@@ -1,6 +1,6 @@
 use crate::state::Fundraiser;
 use pinocchio::pubkey::Pubkey;
-use pinocchio::{account_info::AccountInfo, msg, program_error::ProgramError, ProgramResult};
+use pinocchio::{account_info::AccountInfo, program_error::ProgramError, ProgramResult};
 
 pub fn process_initialize_instruction(accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
     let [maker, fundraiser] = accounts else {

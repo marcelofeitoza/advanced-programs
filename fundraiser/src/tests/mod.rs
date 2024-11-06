@@ -1,8 +1,9 @@
 #[cfg(test)]
 mod tests_module {
+    use crate::instructions::contribute;
     use crate::state::Fundraiser;
     use mollusk_svm::{program, Mollusk};
-    use solana_sdk::account::ReadableAccount;
+    use solana_sdk::account::{ReadableAccount, WritableAccount};
     use solana_sdk::{
         account::AccountSharedData,
         instruction::{AccountMeta, Instruction},
@@ -14,18 +15,18 @@ mod tests_module {
     //     let program_id = Pubkey::new_from_array(five8_const::decode_32_const(
     //         "22222222222222222222222222222222222222222222",
     //     ));
-    //
+
     //     let mollusk = Mollusk::new(&program_id, "../target/deploy/fundraiser");
-    //
+
     //     let maker = Pubkey::new_unique();
     //     let (fundraiser, _) =
     //         Pubkey::find_program_address(&[b"fundraiser", &maker.to_bytes()], &program_id);
     //     let mint = Pubkey::new_unique();
-    //
+
     //     let time_started: i64 = 1_600_000_000;
-    //
+
     //     let duration = 1u8;
-    //
+
     //     let data = [
     //         vec![0],
     //         mint.to_bytes().to_vec(),
@@ -34,7 +35,7 @@ mod tests_module {
     //         duration.to_le_bytes().to_vec(),
     //     ]
     //     .concat();
-    //
+
     //     let instruction = Instruction::new_with_bytes(
     //         program_id,
     //         &data,
@@ -43,9 +44,9 @@ mod tests_module {
     //             AccountMeta::new(fundraiser, false),
     //         ],
     //     );
-    //
+
     //     let lamports = mollusk.sysvars.rent.minimum_balance(Fundraiser::LEN);
-    //
+
     //     let result: mollusk_svm::result::InstructionResult = mollusk.process_instruction(
     //         &instruction,
     //         &vec![
@@ -63,7 +64,7 @@ mod tests_module {
     //         !result.program_result.is_err(),
     //         "Initialize instruction failed."
     //     );
-    //
+
     //     let fundraiser_data = result.get_account(&fundraiser).unwrap().data();
     //     assert_eq!(fundraiser_data.len(), Fundraiser::LEN);
     //     assert_eq!(&fundraiser_data[0..32], maker.to_bytes(), "Maker mismatch"); // Maker
@@ -93,7 +94,6 @@ mod tests_module {
 
     #[test]
     fn contribute() {
-        // Configuração inicial da fundraiser
         let program_id = Pubkey::new_from_array(five8_const::decode_32_const(
             "22222222222222222222222222222222222222222222",
         ));
@@ -123,17 +123,23 @@ mod tests_module {
             program_id,
             &initialize_data,
             vec![
-                AccountMeta::new(maker, true),
-                AccountMeta::new(fundraiser, false),
+                AccountMeta {
+                    pubkey: maker,
+                    is_signer: true,
+                    is_writable: false,
+                },
+                AccountMeta {
+                    pubkey: fundraiser,
+                    is_signer: false,
+                    is_writable: true,
+                },
             ],
         );
 
         let lamports = mollusk.sysvars.rent.minimum_balance(Fundraiser::LEN);
 
-        // Cria `fundraiser_account` para armazenar o estado da fundraiser entre as instruções
         let mut fundraiser_account = AccountSharedData::new(lamports, Fundraiser::LEN, &program_id);
 
-        // Executa a instrução `initialize`
         let result: mollusk_svm::result::InstructionResult = mollusk.process_instruction(
             &initialize_instruction,
             &vec![
@@ -141,7 +147,7 @@ mod tests_module {
                     maker,
                     AccountSharedData::new(1_000_000_000, 0, &Pubkey::default()),
                 ),
-                (fundraiser, fundraiser_account.clone()), // passa a conta `fundraiser` criada acima
+                (fundraiser, fundraiser_account.clone()),
                 (system_program, system_program_account.clone()),
             ],
         );
@@ -150,10 +156,7 @@ mod tests_module {
             "Initialize instruction failed."
         );
 
-        // Atualiza `fundraiser_account` após a execução
         fundraiser_account = result.get_account(&fundraiser).unwrap().clone();
-
-        // Exibe informações da fundraiser inicializada
         println!("Fundraiser: {}", fundraiser);
         println!(
             "Maker: {}",
@@ -184,9 +187,7 @@ mod tests_module {
             u8::from_le_bytes(fundraiser_account.data()[89..90].try_into().unwrap())
         );
 
-        // Realiza a contribuição
-        let amount_to_contribute = 1000u64.to_le_bytes();
-
+        let amount_to_contribute = 1_000u64.to_le_bytes();
         let contributor = Pubkey::new_unique();
         let contributor_ata = Pubkey::new_unique();
         let (contributor_account, _) = Pubkey::find_program_address(
@@ -198,24 +199,54 @@ mod tests_module {
             &program_id,
         );
         let vault = Pubkey::new_unique();
-
+        let token_program_id = Pubkey::new_from_array(five8_const::decode_32_const(
+            "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+        ));
         let contribute_data = [vec![1], amount_to_contribute.to_vec()].concat();
 
         let contribute_instruction = Instruction::new_with_bytes(
             program_id,
             &contribute_data,
             vec![
-                AccountMeta::new(contributor, true),
-                AccountMeta::new(mint, false),
-                AccountMeta::new(fundraiser, false),
-                AccountMeta::new(contributor_ata, false),
-                AccountMeta::new(contributor_account, false),
-                AccountMeta::new(vault, false),
+                AccountMeta {
+                    pubkey: contributor,
+                    is_signer: true,
+                    is_writable: false,
+                },
+                AccountMeta {
+                    pubkey: mint,
+                    is_signer: false,
+                    is_writable: false,
+                },
+                AccountMeta {
+                    pubkey: fundraiser,
+                    is_signer: false,
+                    is_writable: true,
+                },
+                AccountMeta {
+                    pubkey: contributor_ata,
+                    is_signer: false,
+                    is_writable: true,
+                },
+                AccountMeta {
+                    pubkey: contributor_account,
+                    is_signer: false,
+                    is_writable: true,
+                },
+                AccountMeta {
+                    pubkey: vault,
+                    is_signer: false,
+                    is_writable: true,
+                },
+                AccountMeta {
+                    pubkey: token_program_id,
+                    is_signer: false,
+                    is_writable: false,
+                },
             ],
         );
 
-        // Executa a instrução `contribute`
-        let result: mollusk_svm::result::InstructionResult = mollusk.process_instruction(
+        let result = mollusk.process_instruction(
             &contribute_instruction,
             &vec![
                 (
@@ -224,22 +255,26 @@ mod tests_module {
                 ),
                 (
                     mint,
-                    AccountSharedData::new(1_000_000_000, 0, &Pubkey::default()),
+                    AccountSharedData::new(1_000_000_000, 82, &token_program_id),
                 ),
-                (fundraiser, fundraiser_account.clone()), // passa a mesma instância persistente de `fundraiser_account`
+                (fundraiser, fundraiser_account.clone()),
                 (
                     contributor_ata,
-                    AccountSharedData::new(1_000_000_000, 0, &Pubkey::default()),
+                    AccountSharedData::new(1_000_000_000, 165, &token_program_id),
                 ),
                 (
                     contributor_account,
-                    AccountSharedData::new(1_000_000_000, 0, &Pubkey::default()),
+                    AccountSharedData::new(1_000_000_000, 8, &program_id),
                 ),
                 (
                     vault,
-                    AccountSharedData::new(1_000_000_000, 0, &Pubkey::default()),
+                    AccountSharedData::new(1_000_000_000, 165, &token_program_id),
                 ),
-                (system_program, system_program_account),
+                (token_program_id, {
+                    let mut account = AccountSharedData::default();
+                    account.set_executable(true);
+                    account
+                }),
             ],
         );
         assert!(
