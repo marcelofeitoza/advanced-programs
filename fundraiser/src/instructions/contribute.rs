@@ -1,8 +1,10 @@
 use crate::constants::{MAX_CONTRIBUTION_PERCENTAGE, PERCENTAGE_SCALER, SECONDS_TO_DAYS};
 use crate::errors::FundraiserError;
+use crate::state::{Contributor, Fundraiser};
 use pinocchio::sysvars::Sysvar;
 use pinocchio::{
-    account_info::AccountInfo, program_error::ProgramError, sysvars::clock::Clock, ProgramResult,
+    account_info::AccountInfo, msg, program_error::ProgramError, sysvars::clock::Clock,
+    ProgramResult,
 };
 use pinocchio_token::instructions::Transfer;
 
@@ -16,42 +18,12 @@ pub fn process_contribute_instruction(accounts: &[AccountInfo], data: &[u8]) -> 
     if data.len() != 8 {
         return Err(ProgramError::InvalidInstructionData);
     }
-
     let amount = u64::from_le_bytes(
         data.try_into()
             .map_err(|_| ProgramError::InvalidInstructionData)?,
     );
-    let min_contribution = 1_u64;
-    let max_contribution = unsafe {
-        (*(fundraiser.borrow_data_unchecked().as_ptr().add(64) as *const u64)
-            * MAX_CONTRIBUTION_PERCENTAGE)
-            / PERCENTAGE_SCALER
-    };
-    let current_time = Clock::get()?.unix_timestamp;
-    let fundraiser_end_time = unsafe {
-        *(fundraiser.borrow_data_unchecked().as_ptr().add(80) as *const i64)
-            + *(fundraiser.borrow_data_unchecked().as_ptr().add(88) as *const u8) as i64
-                * SECONDS_TO_DAYS
-    };
 
-    if !contributor.is_signer() {
-        return Err(ProgramError::MissingRequiredSignature);
-    }
-    if amount < min_contribution {
-        return Err(ProgramError::Custom(
-            FundraiserError::ContributionTooSmall as u32,
-        ));
-    }
-    if amount > max_contribution {
-        return Err(ProgramError::Custom(
-            FundraiserError::ContributionTooBig as u32,
-        ));
-    }
-    if current_time > fundraiser_end_time {
-        return Err(ProgramError::Custom(
-            FundraiserError::FundraiserEnded as u32,
-        ));
-    }
+    msg!("Amount from data: {}", amount);
 
     Transfer {
         from: contributor_ata,
@@ -61,19 +33,26 @@ pub fn process_contribute_instruction(accounts: &[AccountInfo], data: &[u8]) -> 
     }
     .invoke()?;
 
+    // unsafe { fundraiser.borrow_mut_data_unchecked()[64..72].copy_from_slice(&(fundraiser_account.remaining_amount() - amount).to_le_bytes()); }
+    let fundraiser_account_data = Fundraiser::from_account_info(fundraiser)?;
+    let contributor_account_data = Contributor::from_account_info(contributor_account)?;
     unsafe {
-        let current_amount_ptr =
-            fundraiser.borrow_mut_data_unchecked().as_mut_ptr().add(72) as *mut u64;
-        let current_amount = *current_amount_ptr;
-        let new_amount = current_amount + amount;
+        fundraiser.borrow_mut_data_unchecked()[72..80]
+            .copy_from_slice(&(fundraiser_account_data.current_amount() + amount).to_le_bytes());
+        msg!(
+            "Fundraiser account current amount: {}",
+            Fundraiser::from_account_info(fundraiser)?.current_amount()
+        );
 
-        *current_amount_ptr = new_amount;
+        contributor.borrow_mut_data_unchecked()[0..8]
+            .copy_from_slice(&(contributor_account_data.amount() + amount).to_le_bytes());
+        msg!(
+            "Contributor account amount: {}",
+            Contributor::from_account_info(contributor_account)?.amount()
+        );
     }
 
-    unsafe {
-        contributor_account.borrow_mut_data_unchecked()[0..8]
-            .copy_from_slice(&amount.to_le_bytes());
-    }
+    msg!("Contributed {} to the fundraiser", amount);
 
     Ok(())
 }
