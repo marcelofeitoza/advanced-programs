@@ -19,10 +19,6 @@ pub fn process_initialize_instruction(accounts: &[AccountInfo], data: &[u8]) -> 
     ); // 3 CUs
     assert!(maker.is_signer(), "Maker account is not signer"); // 2 CUs
 
-    if data.len() != 49 {
-        return Err(ProgramError::InvalidInstructionData);
-    }
-
     unsafe {
         *(fundraiser.borrow_mut_data_unchecked().as_mut_ptr() as *mut Pubkey) = *maker.key();
         *(fundraiser.borrow_mut_data_unchecked().as_mut_ptr().add(32) as *mut Pubkey) =
