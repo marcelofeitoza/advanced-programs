@@ -6,6 +6,7 @@ use pinocchio::account_info::AccountInfo;
 use pinocchio::program_error::ProgramError;
 use pinocchio::pubkey::Pubkey;
 use pinocchio::{entrypoint, ProgramResult};
+use crate::instructions::refund::process_refund_instruction;
 
 mod constants;
 mod errors;
@@ -42,7 +43,7 @@ pub fn process_instruction(
         FundraiserInstruction::CheckContributionsInstruction => {
             process_check_instruction(accounts)?
         }
-        FundraiserInstruction::RefundInstruction => return Ok(()),
+        FundraiserInstruction::RefundInstruction => process_refund_instruction(accounts)?
     }
 
     Ok(())
