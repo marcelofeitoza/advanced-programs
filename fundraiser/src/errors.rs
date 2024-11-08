@@ -7,4 +7,5 @@ pub enum FundraiserError {
     FundraiserNotEnded,
     FundraiserEnded,
     InvalidAmount,
+    InvalidMint,
 }

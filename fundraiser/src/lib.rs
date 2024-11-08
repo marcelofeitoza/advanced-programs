@@ -1,3 +1,4 @@
+use crate::instructions::check::process_check_instruction;
 use crate::instructions::contribute::process_contribute_instruction;
 use crate::instructions::{process_initialize_instruction, FundraiserInstruction};
 use five8_const::decode_32_const;
@@ -10,6 +11,8 @@ mod constants;
 mod errors;
 mod instructions;
 mod state;
+
+#[cfg(test)]
 mod tests;
 
 const ID: [u8; 32] = decode_32_const("22222222222222222222222222222222222222222222");
@@ -25,18 +28,20 @@ pub fn process_instruction(
         return Err(ProgramError::IncorrectProgramId);
     }
 
-    let (instruction_discrimnant, restinstruction_inner_data) = data
+    let (instruction_discrimnant, instruction_data) = data
         .split_first()
         .ok_or(ProgramError::InvalidInstructionData)?;
 
     match FundraiserInstruction::try_from(instruction_discrimnant)? {
         FundraiserInstruction::InitializeInstruction => {
-            process_initialize_instruction(accounts, restinstruction_inner_data)?
+            process_initialize_instruction(accounts, instruction_data)?
         }
         FundraiserInstruction::ContributeInstruction => {
-            process_contribute_instruction(accounts, restinstruction_inner_data)?
+            process_contribute_instruction(accounts, instruction_data)?
         }
-        FundraiserInstruction::CheckContributionsInstruction => return Ok(()),
+        FundraiserInstruction::CheckContributionsInstruction => {
+            process_check_instruction(accounts)?
+        }
         FundraiserInstruction::RefundInstruction => return Ok(()),
     }
 
