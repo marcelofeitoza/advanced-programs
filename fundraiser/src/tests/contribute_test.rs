@@ -15,7 +15,7 @@ fn contribute_test() {
     let (token_program, token_program_account) = mollusk_token::token::keyed_account();
 
     let maker = Pubkey::new_from_array([0x1; 32]);
-    let signer = Pubkey::new_unique();
+    let signer = Pubkey::new_from_array([0x2; 32]);
     let signer_account = utils::create_account(
         mollusk
             .sysvars
@@ -24,7 +24,7 @@ fn contribute_test() {
         spl_token::state::Account::LEN,
         &program_id,
     );
-    let signer_ta = Pubkey::new_unique();
+    let signer_ta = Pubkey::new_from_array([0x3; 32]);
     let fundraiser =
         Pubkey::find_program_address(&[b"fundraiser", &maker.to_bytes()], &program_id).0;
     let contributor = Pubkey::find_program_address(
@@ -36,8 +36,8 @@ fn contribute_test() {
         &program_id,
     )
     .0;
-    let mint = Pubkey::new_unique();
-    let vault = Pubkey::new_unique();
+    let mint = Pubkey::new_from_array([0x4; 32]);
+    let vault = Pubkey::new_from_array([0x5; 32]);
 
     let mint_account = utils::pack_mint(&contributor, 1_000_000);
     let signer_ta_account = utils::pack_token_account(&signer, &mint, 1_000_000);
@@ -55,7 +55,6 @@ fn contribute_test() {
     );
 
     let slot = mollusk.sysvars.clock.slot + 200;
-
     fundraiser_account.set_data_from_slice(
         &[
             maker.to_bytes().to_vec(),

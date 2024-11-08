@@ -2,11 +2,12 @@
 mod contribute_test;
 #[cfg(test)]
 mod initalize_test;
+#[cfg(test)]
+mod check_test;
 
 use mollusk_svm::Mollusk;
 use solana_sdk::pubkey::Pubkey;
 
-mod check_test;
 mod utils;
 
 pub fn setup() -> (Pubkey, Mollusk) {

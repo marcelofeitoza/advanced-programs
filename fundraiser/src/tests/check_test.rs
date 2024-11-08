@@ -13,7 +13,7 @@ fn check_test() {
     let (program_id, mut mollusk) = setup();
     let (token_program, token_program_account) = mollusk_token::token::keyed_account();
 
-    let maker = Pubkey::new_unique();
+    let maker = Pubkey::new_from_array([0x1; 32]);
     let signer = maker;
     let signer_account = utils::create_account(
         mollusk
@@ -23,7 +23,7 @@ fn check_test() {
         spl_token::state::Account::LEN,
         &program_id,
     );
-    let signer_ta = Pubkey::new_unique();
+    let signer_ta = Pubkey::new_from_array([0x3; 32]);
     let fundraiser =
         Pubkey::find_program_address(&[b"fundraiser", &maker.to_bytes()], &program_id).0;
     let contributor = Pubkey::find_program_address(
@@ -35,8 +35,8 @@ fn check_test() {
         &program_id,
     )
     .0;
-    let mint = Pubkey::new_unique();
-    let vault = Pubkey::new_unique();
+    let mint = Pubkey::new_from_array([0x4; 32]);
+    let vault = Pubkey::new_from_array([0x5; 32]);
 
     let mut mint_account = utils::pack_mint(&signer, 1_000_000);
     let mut mint_account_data = mint_account.data().to_vec();
