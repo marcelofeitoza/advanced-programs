@@ -17,7 +17,7 @@ pub fn process_initialize_instruction(accounts: &[AccountInfo], data: &[u8]) -> 
         Fundraiser::LEN,
         "Invalid fundraiser account data length"
     ); // 3 CUs
-    assert!(maker.is_signer(), "Maker account is not signer"); // 22 CUs
+    assert!(maker.is_signer(), "Maker account is not signer"); // 2 CUs
 
     if data.len() != 49 {
         return Err(ProgramError::InvalidInstructionData);
