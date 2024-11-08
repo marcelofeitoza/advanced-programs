@@ -1,5 +1,5 @@
 use crate::state::{Contributor, Fundraiser};
-use crate::tests::{setup, utils};
+use crate::tests::setup;
 use pinocchio_token::state::TokenAccount;
 use solana_sdk::account::{AccountSharedData, ReadableAccount};
 use solana_sdk::{
@@ -15,7 +15,7 @@ fn check_test() {
 
     let maker = Pubkey::new_from_array([0x1; 32]);
     let signer = maker;
-    let signer_account = utils::create_account(
+    let signer_account = crate::tests::create_account(
         mollusk
             .sysvars
             .rent
@@ -38,13 +38,13 @@ fn check_test() {
     let mint = Pubkey::new_from_array([0x4; 32]);
     let vault = Pubkey::new_from_array([0x5; 32]);
 
-    let mut mint_account = utils::pack_mint(&signer, 1_000_000);
+    let mut mint_account = crate::tests::pack_mint(&signer, 1_000_000);
     let mut mint_account_data = mint_account.data().to_vec();
     mint_account_data[36..44].copy_from_slice(&1_000_000u64.to_le_bytes());
     mint_account.set_data_from_slice(&mint_account_data);
 
-    let signer_ta_account = utils::pack_token_account(&signer, &mint, 1_000_000);
-    let vault_account = utils::pack_token_account(&fundraiser, &mint, 0);
+    let signer_ta_account = crate::tests::pack_token_account(&signer, &mint, 1_000_000);
+    let vault_account = crate::tests::pack_token_account(&fundraiser, &mint, 0);
 
     let amount_to_raise: u64 = 100;
     let current_amount: u64 = 0;
@@ -57,7 +57,7 @@ fn check_test() {
         Fundraiser::LEN,
         &program_id,
     );
-    let mut contributor_account = utils::create_account(
+    let mut contributor_account = crate::tests::create_account(
         mollusk.sysvars.rent.minimum_balance(Contributor::LEN),
         Contributor::LEN,
         &program_id,

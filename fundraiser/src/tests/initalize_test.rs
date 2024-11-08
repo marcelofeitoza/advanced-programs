@@ -1,5 +1,5 @@
 use crate::state::Fundraiser;
-use crate::tests::{setup, utils};
+use crate::tests::setup;
 use solana_sdk::account::ReadableAccount;
 use solana_sdk::{
     account::AccountSharedData,
@@ -16,7 +16,7 @@ fn test_initialize() {
     let (fundraiser, _) =
         Pubkey::find_program_address(&[b"fundraiser", &maker.to_bytes()], &program_id);
     let mint = Pubkey::new_from_array([0x02; 32]);
-    let mint_account = utils::pack_mint(&maker, 1_000_000);
+    let mint_account = crate::tests::pack_mint(&maker, 1_000_000);
 
     let time_started: i64 = 1_600_000_000;
     let duration = 1u8;

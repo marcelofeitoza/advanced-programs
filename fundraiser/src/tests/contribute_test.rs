@@ -6,7 +6,6 @@ use solana_sdk::{
 };
 
 use crate::state::Contributor;
-use crate::tests::utils;
 use crate::{constants::MIN_AMOUNT_TO_RAISE, state::Fundraiser, tests::setup};
 
 #[test]
@@ -16,7 +15,7 @@ fn contribute_test() {
 
     let maker = Pubkey::new_from_array([0x1; 32]);
     let signer = Pubkey::new_from_array([0x2; 32]);
-    let signer_account = utils::create_account(
+    let signer_account = crate::tests::create_account(
         mollusk
             .sysvars
             .rent
@@ -39,16 +38,16 @@ fn contribute_test() {
     let mint = Pubkey::new_from_array([0x4; 32]);
     let vault = Pubkey::new_from_array([0x5; 32]);
 
-    let mint_account = utils::pack_mint(&contributor, 1_000_000);
-    let signer_ta_account = utils::pack_token_account(&signer, &mint, 1_000_000);
-    let vault_account = utils::pack_token_account(&fundraiser, &mint, 0);
+    let mint_account = crate::tests::pack_mint(&contributor, 1_000_000);
+    let signer_ta_account = crate::tests::pack_token_account(&signer, &mint, 1_000_000);
+    let vault_account = crate::tests::pack_token_account(&fundraiser, &mint, 0);
 
-    let mut fundraiser_account = utils::create_account(
+    let mut fundraiser_account = crate::tests::create_account(
         mollusk.sysvars.rent.minimum_balance(Fundraiser::LEN),
         Fundraiser::LEN,
         &program_id,
     );
-    let mut contributor_account = utils::create_account(
+    let mut contributor_account = crate::tests::create_account(
         mollusk.sysvars.rent.minimum_balance(Contributor::LEN),
         Contributor::LEN,
         &program_id,
