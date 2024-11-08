@@ -63,7 +63,6 @@ fn check_test() {
         ],
     );
 
-
     let result = mollusk.process_instruction(
         &check_instruction,
         &vec![
