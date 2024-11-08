@@ -4,13 +4,12 @@ use pinocchio_token::state::TokenAccount;
 use solana_sdk::account::{AccountSharedData, ReadableAccount};
 use solana_sdk::{
     instruction::{AccountMeta, Instruction},
-    program_pack::Pack,
     pubkey::Pubkey,
 };
 
 #[test]
 fn refund_test() {
-    let (program_id, mut mollusk) = setup();
+    let (program_id, mollusk) = setup();
     let (token_program, token_program_account) = mollusk_token::token::keyed_account();
 
     let maker = Pubkey::new_from_array([0x1; 32]);
@@ -52,9 +51,6 @@ fn refund_test() {
 
     contributor_account.set_data_from_slice(&100u64.to_le_bytes());
 
-    let vault_ta_before = unsafe { TokenAccount::from_bytes(vault.to_bytes().as_ref()) };
-    println!("Vault balance before: {:?}", vault_ta_before.amount());
-
     let refund_data = vec![vec![3]].concat();
 
     let refund_instruction = Instruction::new_with_bytes(
@@ -83,6 +79,7 @@ fn refund_test() {
         !result.program_result.is_err(),
         "process_refund_instruction failed."
     );
+    println!("Compute Units: {}", result.compute_units_consumed);
 
     let vault_result = result
         .get_account(&vault)

@@ -8,7 +8,7 @@ use solana_sdk::{
 };
 
 #[test]
-fn test_initialize() {
+pub fn initialize_test() {
     let (program_id, mollusk) = setup();
 
     let maker = Pubkey::new_from_array([0x01; 32]);
@@ -56,38 +56,20 @@ fn test_initialize() {
         !result.program_result.is_err(),
         "Initialize instruction failed."
     );
+    println!("Compute Units: {}", result.compute_units_consumed);
 
     let fundraiser_result_account = result
         .get_account(&fundraiser)
         .expect("Failed to find fundraiser account");
     let data = fundraiser_result_account.data();
-    println!("Fundraiser data:");
-    println!(
-        "Maker: {:?}",
-        Pubkey::new_from_array(data[0..32].try_into().unwrap())
+    assert_eq!(u64::from_le_bytes(data[72..80].try_into().unwrap()), 0);
+    assert_eq!(
+        i64::from_le_bytes(data[80..88].try_into().unwrap()),
+        time_started
     );
-    println!(
-        "Mint to raise: {:?}",
-        Pubkey::new_from_array(data[32..64].try_into().unwrap())
+    assert_eq!(
+        u8::from_le_bytes(data[88..89].try_into().unwrap()),
+        duration
     );
-    println!(
-        "Amount to raise: {:?}",
-        u64::from_le_bytes(data[64..72].try_into().unwrap())
-    );
-    println!(
-        "Current amount: {:?}",
-        u64::from_le_bytes(data[72..80].try_into().unwrap())
-    );
-    println!(
-        "Time started: {:?}",
-        i64::from_le_bytes(data[80..88].try_into().unwrap())
-    );
-    println!(
-        "Duration: {:?}",
-        u8::from_le_bytes(data[88..89].try_into().unwrap())
-    );
-    println!(
-        "Bump seed: {:?}",
-        u8::from_le_bytes(data[89..90].try_into().unwrap())
-    );
+    assert_eq!(u8::from_le_bytes(data[89..90].try_into().unwrap()), 0);
 }

@@ -11,17 +11,13 @@ pub fn process_initialize_instruction(accounts: &[AccountInfo], data: &[u8]) -> 
         fundraiser.owner(),
         &crate::ID,
         "Invalid fundraiser account owner"
-    ); // 17 CUs
+    );
     assert_eq!(
         fundraiser.data_len(),
         Fundraiser::LEN,
         "Invalid fundraiser account data length"
-    ); // 3 CUs
-    assert!(maker.is_signer(), "Maker account is not signer"); // 2 CUs
-
-    if data.len() != 49 {
-        return Err(ProgramError::InvalidInstructionData);
-    }
+    );
+    assert!(maker.is_signer(), "Maker account is not signer");
 
     unsafe {
         *(fundraiser.borrow_mut_data_unchecked().as_mut_ptr() as *mut Pubkey) = *maker.key();
