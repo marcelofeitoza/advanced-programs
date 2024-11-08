@@ -6,7 +6,7 @@ pub fn process_contribute_instruction(accounts: &[AccountInfo], data: &[u8]) -> 
     let amount: u64 = unsafe { *(data.as_ptr() as *const u64) };
     assert!(amount >= MIN_AMOUNT_TO_RAISE, "Amount too low"); // 2 CUs
 
-    let [signer, contributor, signer_ta, fundraiser, mint, vault, _token_program] = accounts else {
+    let [signer, contributor, signer_ta, fundraiser, vault, _token_program] = accounts else {
         return Err(ProgramError::NotEnoughAccountKeys);
     };
 

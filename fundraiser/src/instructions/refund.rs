@@ -1,12 +1,11 @@
 use crate::state::{Contributor, Fundraiser};
 use pinocchio::account_info::AccountInfo;
 use pinocchio::program_error::ProgramError;
-use pinocchio::{msg, signer, ProgramResult};
+use pinocchio::{signer, ProgramResult};
 use pinocchio_token::instructions::Transfer;
-use pinocchio_token::state::TokenAccount;
 
 pub fn process_refund_instruction(accounts: &[AccountInfo]) -> ProgramResult {
-    let [fundraiser, contributor_account, contributor_ta, vault, token_program] = accounts else {
+    let [fundraiser, contributor_account, contributor_ta, vault, _token_program] = accounts else {
         return Err(ProgramError::NotEnoughAccountKeys);
     };
 

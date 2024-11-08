@@ -1,11 +1,11 @@
-pub enum FundraiserError {
-    TargetNotMet,
-    TargetMet,
-    ContributionTooBig,
-    ContributionTooSmall,
-    MaximumContributionsReached,
-    FundraiserNotEnded,
-    FundraiserEnded,
-    InvalidAmount,
-    InvalidMint,
-}
+// pub enum FundraiserError {
+//     TargetNotMet,
+//     TargetMet,
+//     ContributionTooBig,
+//     ContributionTooSmall,
+//     MaximumContributionsReached,
+//     FundraiserNotEnded,
+//     FundraiserEnded,
+//     InvalidAmount,
+//     InvalidMint,
+// }

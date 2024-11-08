@@ -3,7 +3,7 @@ use pinocchio::{account_info::AccountInfo, program_error::ProgramError, signer, 
 use pinocchio_token::instructions::Transfer;
 
 pub fn process_check_instruction(accounts: &[AccountInfo]) -> ProgramResult {
-    let [signer, signer_ta, fundraiser, vault, token_program] = accounts else {
+    let [signer, signer_ta, fundraiser, vault, _token_program] = accounts else {
         return Err(ProgramError::NotEnoughAccountKeys);
     };
 
