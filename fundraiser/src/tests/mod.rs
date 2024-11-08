@@ -1,9 +1,9 @@
 #[cfg(test)]
+mod check_test;
+#[cfg(test)]
 mod contribute_test;
 #[cfg(test)]
 mod initalize_test;
-#[cfg(test)]
-mod check_test;
 
 use mollusk_svm::Mollusk;
 use solana_sdk::pubkey::Pubkey;
