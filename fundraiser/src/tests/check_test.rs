@@ -10,7 +10,7 @@ use solana_sdk::{
 
 #[test]
 fn check_test() {
-    let (program_id, mut mollusk) = setup();
+    let (program_id, mollusk) = setup();
     let (token_program, token_program_account) = mollusk_token::token::keyed_account();
 
     let maker = Pubkey::new_from_array([0x1; 32]);
@@ -57,7 +57,7 @@ fn check_test() {
         Fundraiser::LEN,
         &program_id,
     );
-    let mut contributor_account = crate::tests::create_account(
+    let contributor_account = crate::tests::create_account(
         mollusk.sysvars.rent.minimum_balance(Contributor::LEN),
         Contributor::LEN,
         &program_id,
@@ -93,7 +93,6 @@ fn check_test() {
             AccountMeta::new(contributor, true),
             AccountMeta::new(signer_ta, false),
             AccountMeta::new(fundraiser, false),
-            AccountMeta::new(mint, false),
             AccountMeta::new(vault, false),
             AccountMeta::new(token_program, false),
         ],
@@ -102,13 +101,12 @@ fn check_test() {
     let result = mollusk.process_instruction(
         &contribute_instruction,
         &vec![
-            (signer.clone(), signer_account.clone()),
+            (signer, signer_account.clone()),
             (contributor, contributor_account),
             (signer_ta, signer_ta_account.clone()),
             (fundraiser, fundraiser_account.clone()),
-            (mint, mint_account),
             (vault, vault_account.clone()),
-            (token_program.clone(), token_program_account.clone()),
+            (token_program, token_program_account.clone()),
         ],
     );
     assert!(

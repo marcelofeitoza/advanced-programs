@@ -38,7 +38,6 @@ fn contribute_test() {
     let mint = Pubkey::new_from_array([0x4; 32]);
     let vault = Pubkey::new_from_array([0x5; 32]);
 
-    let mint_account = crate::tests::pack_mint(&contributor, 1_000_000);
     let signer_ta_account = crate::tests::pack_token_account(&signer, &mint, 1_000_000);
     let vault_account = crate::tests::pack_token_account(&fundraiser, &mint, 0);
 
@@ -47,7 +46,7 @@ fn contribute_test() {
         Fundraiser::LEN,
         &program_id,
     );
-    let mut contributor_account = crate::tests::create_account(
+    let contributor_account = crate::tests::create_account(
         mollusk.sysvars.rent.minimum_balance(Contributor::LEN),
         Contributor::LEN,
         &program_id,
@@ -78,7 +77,6 @@ fn contribute_test() {
             AccountMeta::new(contributor, true),
             AccountMeta::new(signer_ta, false),
             AccountMeta::new(fundraiser, false),
-            AccountMeta::new(mint, false),
             AccountMeta::new(vault, false),
             AccountMeta::new(token_program, false),
         ],
@@ -91,7 +89,6 @@ fn contribute_test() {
             (contributor, contributor_account),
             (signer_ta, signer_ta_account),
             (fundraiser, fundraiser_account.clone()),
-            (mint, mint_account),
             (vault, vault_account.clone()),
             (token_program, token_program_account),
         ],

@@ -320,11 +320,11 @@ dependencies = [
 
 [[package]]
 name = "borsh"
-version = "1.5.1"
+version = "1.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a6362ed55def622cddc70a4746a68554d7b687713770de539e59a739b249f8ed"
+checksum = "f5327f6c99920069d1fe374aa743be1af0031dea9f250852cdf1ae6a0861ee24"
 dependencies = [
- "borsh-derive 1.5.1",
+ "borsh-derive 1.5.2",
  "cfg_aliases",
 ]
 
@@ -343,16 +343,15 @@ dependencies = [
 
 [[package]]
 name = "borsh-derive"
-version = "1.5.1"
+version = "1.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c3ef8005764f53cd4dca619f5bf64cafd4664dada50ece25e4d81de54c80cc0b"
+checksum = "10aedd8f1a81a8aafbfde924b0e3061cd6fedd6f6bbcfc6a76e6fd426d7bfe26"
 dependencies = [
  "once_cell",
  "proc-macro-crate 3.2.0",
  "proc-macro2",
  "quote",
  "syn 2.0.87",
- "syn_derive",
 ]
 
 [[package]]
@@ -457,9 +456,9 @@ checksum = "9ac0150caa2ae65ca5bd83f25c7de183dea78d4d366469f148435e2acfbad0da"
 
 [[package]]
 name = "cc"
-version = "1.1.36"
+version = "1.1.37"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "baee610e9452a8f6f0a1b6194ec09ff9e2d85dea54432acdae41aa0761c95d70"
+checksum = "40545c26d092346d8a8dab71ee48e7685a7a9cba76e634790c215b41a4a7b4cf"
 dependencies = [
  "shlex",
 ]
@@ -1375,9 +1374,9 @@ checksum = "bbd2bcb4c963f2ddae06a2efc7e9f3591312473c50c6685e1f298068316e66fe"
 
 [[package]]
 name = "libc"
-version = "0.2.161"
+version = "0.2.162"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8e9489c2807c139ffd9c1794f4af0ebe86a828db53ecdc7fea2111d0fed085d1"
+checksum = "18d287de67fe55fd7e1581fe933d965a5a9477b38e949cfa9f8574ef01506398"
 
 [[package]]
 name = "libsecp256k1"
@@ -1796,29 +1795,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8ecf48c7ca261d60b74ab1a7b20da18bede46776b2e55535cb958eb595c5fa7b"
 dependencies = [
  "toml_edit",
-]
-
-[[package]]
-name = "proc-macro-error"
-version = "1.0.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "da25490ff9892aab3fcf7c36f08cfb902dd3e71ca0f9f9517bea02a73a5ce38c"
-dependencies = [
- "proc-macro-error-attr",
- "proc-macro2",
- "quote",
- "version_check",
-]
-
-[[package]]
-name = "proc-macro-error-attr"
-version = "1.0.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a1be40180e52ecc98ad80b184934baf3d0d29f979574e439af5a55274b35f869"
-dependencies = [
- "proc-macro2",
- "quote",
- "version_check",
 ]
 
 [[package]]
@@ -2317,7 +2293,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a5d526f3525ab22a3ada3f9a1d642664dafac00dc9208326b701a2045514eb04"
 dependencies = [
  "borsh 0.10.4",
- "borsh 1.5.1",
+ "borsh 1.5.2",
 ]
 
 [[package]]
@@ -2462,7 +2438,7 @@ version = "2.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1807bc4e9e1d25271514167d5a1e698ce5a330bce547a368242dd63b355b5faa"
 dependencies = [
- "borsh 1.5.1",
+ "borsh 1.5.2",
  "bs58",
  "bytemuck",
  "bytemuck_derive",
@@ -2491,7 +2467,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bfef689e06e5c7cb6206d4dc61ac77733de4f72d754e0d531393206abc27dbe4"
 dependencies = [
  "bincode",
- "borsh 1.5.1",
+ "borsh 1.5.2",
  "getrandom 0.2.15",
  "js-sys",
  "num-traits",
@@ -2616,7 +2592,7 @@ dependencies = [
  "bitflags 2.6.0",
  "blake3",
  "borsh 0.10.4",
- "borsh 1.5.1",
+ "borsh 1.5.2",
  "bs58",
  "bv",
  "bytemuck",
@@ -2695,7 +2671,7 @@ version = "2.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dd089caeef26dd07bd12b7b67d45e92faddc2fc67a960f316df7ae4776a2f3d5"
 dependencies = [
- "borsh 1.5.1",
+ "borsh 1.5.2",
  "num-traits",
  "serde",
  "serde_derive",
@@ -2767,7 +2743,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bea3215775fcedf200d47590c7e2ce9a3a46bc2b7d3f77d0eae9c6edf0a39aec"
 dependencies = [
  "borsh 0.10.4",
- "borsh 1.5.1",
+ "borsh 1.5.2",
  "bs58",
  "bytemuck",
  "bytemuck_derive",
@@ -2812,7 +2788,7 @@ checksum = "524604d94185c189616296e5b7da1014cc96d1e446bd2b26f247f00708b9225a"
 dependencies = [
  "bincode",
  "bitflags 2.6.0",
- "borsh 1.5.1",
+ "borsh 1.5.2",
  "bs58",
  "bytemuck",
  "bytemuck_derive",
@@ -2885,7 +2861,7 @@ version = "2.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f2eef5a00a75648273c3fb6e3d85b0c8c02fcc1e36c4271664dcc39b6b128d41"
 dependencies = [
- "borsh 1.5.1",
+ "borsh 1.5.2",
  "libsecp256k1",
  "solana-define-syscall",
  "thiserror",
@@ -3121,18 +3097,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "syn_derive"
-version = "0.1.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1329189c02ff984e9736652b1631330da25eaa6bc639089ed4915d25446cbe7b"
-dependencies = [
- "proc-macro-error",
- "proc-macro2",
- "quote",
- "syn 2.0.87",
-]
-
-[[package]]
 name = "sync_wrapper"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3226,9 +3190,9 @@ checksum = "1f3ccbac311fea05f86f61904b462b55fb3df8837a366dfc601a0161d0532f20"
 
 [[package]]
 name = "tokio"
-version = "1.41.0"
+version = "1.41.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "145f3413504347a2be84393cc8a7d2fb4d863b375909ea59f2158261aa258bbb"
+checksum = "22cfb5bee7a6a52939ca9224d6ac897bb669134078daa8735560897f69de4d33"
 dependencies = [
  "backtrace",
  "bytes",
