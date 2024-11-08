@@ -76,10 +76,13 @@ fn check_test() {
         .concat(),
     );
 
-    assert_eq!(fundraiser_account.lamports(), mollusk.sysvars.rent.minimum_balance(Fundraiser::LEN));
+    assert_eq!(
+        fundraiser_account.lamports(),
+        mollusk.sysvars.rent.minimum_balance(Fundraiser::LEN)
+    );
     assert_eq!(fundraiser_account.data().len(), Fundraiser::LEN);
 
-    let amount_to_contribute: u64 = 10;
+    let amount_to_contribute: u64 = 100; // all the amount_to_raise
     let contribute_data = [vec![1], amount_to_contribute.to_le_bytes().to_vec()].concat();
 
     let contribute_instruction = Instruction::new_with_bytes(
@@ -148,10 +151,7 @@ fn check_test() {
         .expect("Failed to find vault account");
     let vault_data = vault_result_account.data();
     let vault_ta_before = unsafe { TokenAccount::from_bytes(vault_data) };
-    println!(
-        "Vault balance before: {:?}",
-        vault_ta_before.amount()
-    );
+    println!("Vault balance before: {:?}", vault_ta_before.amount());
 
     let signer_ta_result_account = result
         .get_account(&signer_ta)
@@ -183,10 +183,7 @@ fn check_test() {
         .expect("Failed to find vault account");
     let vault_data = vault_result_account.data();
     let vault_ta_after = unsafe { TokenAccount::from_bytes(vault_data) };
-    println!(
-        "Vault balance: {:?}",
-        vault_ta_after.amount()
-    );
+    println!("Vault balance: {:?}", vault_ta_after.amount());
 
     let signer_ta_result_account = result
         .get_account(&signer_ta)
