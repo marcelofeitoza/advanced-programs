@@ -29,11 +29,11 @@ pub fn process_instruction(
         return Err(ProgramError::IncorrectProgramId);
     }
 
-    let (instruction_discrimnant, instruction_data) = data
+    let (instruction_discriminant, instruction_data) = data
         .split_first()
         .ok_or(ProgramError::InvalidInstructionData)?;
 
-    match FundraiserInstruction::try_from(instruction_discrimnant)? {
+    match FundraiserInstruction::try_from(instruction_discriminant)? {
         FundraiserInstruction::InitializeInstruction => {
             process_initialize_instruction(accounts, instruction_data)?
         }

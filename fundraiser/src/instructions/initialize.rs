@@ -1,35 +1,24 @@
-use crate::state::Fundraiser;
 use pinocchio::pubkey::Pubkey;
 use pinocchio::{account_info::AccountInfo, program_error::ProgramError, ProgramResult};
 
 pub fn process_initialize_instruction(accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
-    let [maker, fundraiser] = accounts else {
+    let [fundraiser] = accounts else {
         return Err(ProgramError::NotEnoughAccountKeys);
     };
 
-    assert_eq!(
-        fundraiser.owner(),
-        &crate::ID,
-        "Invalid fundraiser account owner"
-    );
-    assert_eq!(
-        fundraiser.data_len(),
-        Fundraiser::LEN,
-        "Invalid fundraiser account data length"
-    );
-    assert!(maker.is_signer(), "Maker account is not signer");
-
     unsafe {
-        *(fundraiser.borrow_mut_data_unchecked().as_mut_ptr() as *mut Pubkey) = *maker.key();
-        *(fundraiser.borrow_mut_data_unchecked().as_mut_ptr().add(32) as *mut Pubkey) =
-            data[0..32].try_into().unwrap();
-        *(fundraiser.borrow_mut_data_unchecked().as_mut_ptr().add(64) as *mut u64) =
-            u64::from_le_bytes(data[32..40].try_into().unwrap());
-        *(fundraiser.borrow_mut_data_unchecked().as_mut_ptr().add(72) as *mut u64) = 0;
-        *(fundraiser.borrow_mut_data_unchecked().as_mut_ptr().add(80) as *mut i64) =
-            i64::from_le_bytes(data[40..48].try_into().unwrap());
-        *(fundraiser.borrow_mut_data_unchecked().as_mut_ptr().add(88)) = data[48];
-        *(fundraiser.borrow_mut_data_unchecked().as_mut_ptr().add(89)) = 0;
+        let fundraiser_account = fundraiser.borrow_mut_data_unchecked().as_mut_ptr();
+
+        // Cost: 113 CUs
+        *(fundraiser_account.add(8) as *mut u64) = *((data.as_ptr()) as *const u64); // time started
+        *(fundraiser_account.add(16) as *mut Pubkey) = *((data.as_ptr()).add(8) as *const Pubkey); // maker
+        *(fundraiser_account.add(48) as *mut Pubkey) = *((data.as_ptr()).add(40) as *const Pubkey); // mint
+        *(fundraiser_account.add(80) as *mut u64) = *((data.as_ptr()).add(72) as *const u64); // amount to raise
+        *(fundraiser_account.add(88) as *mut u64) = *((data.as_ptr()).add(80) as *const u64); // duration
+        *(fundraiser_account.add(89)) = *((data.as_ptr()).add(81)); // bump
+
+        // Cost: 212 CUs
+        // *(fundraiser_account.add(8) as *mut [u8; 82]) = *(data.as_ptr() as *const [u8; 82]);
     }
 
     Ok(())

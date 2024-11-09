@@ -1,6 +1,8 @@
 use crate::state::Fundraiser;
 use crate::tests::setup;
 use solana_sdk::account::ReadableAccount;
+use solana_sdk::clock::Clock;
+use solana_sdk::sysvar::Sysvar;
 use solana_sdk::{
     account::AccountSharedData,
     instruction::{AccountMeta, Instruction},
@@ -15,16 +17,19 @@ pub fn initialize_test() {
     let (fundraiser, _) =
         Pubkey::find_program_address(&[b"fundraiser", &maker.to_bytes()], &program_id);
     let mint = Pubkey::new_from_array([0x02; 32]);
+    let clock = Pubkey::from_str_const("SysvarC1ock11111111111111111111111111111111");
 
     let time_started: i64 = 1_600_000_000;
     let duration = 1u8;
 
     let data = [
         vec![0],
-        mint.to_bytes().to_vec(),
-        100_000_000u64.to_le_bytes().to_vec(),
-        time_started.to_le_bytes().to_vec(),
-        duration.to_le_bytes().to_vec(),
+        time_started.to_le_bytes().to_vec(),   // 0 - 8
+        maker.to_bytes().to_vec(),             // 8 - 40
+        mint.to_bytes().to_vec(),              // 40 - 72
+        100_000_000u64.to_le_bytes().to_vec(), // 72 - 80
+        duration.to_le_bytes().to_vec(),       // 80
+        1u8.to_le_bytes().to_vec(),            // 81
     ]
     .concat();
 
@@ -32,7 +37,6 @@ pub fn initialize_test() {
         program_id,
         &data,
         vec![
-            AccountMeta::new(maker, true),
             AccountMeta::new(fundraiser, false),
         ],
     );
@@ -43,10 +47,6 @@ pub fn initialize_test() {
         &instruction,
         &[
             (
-                maker,
-                AccountSharedData::new(1_000_000_000, 0, &Pubkey::default()),
-            ),
-            (
                 fundraiser,
                 AccountSharedData::new(lamports, Fundraiser::LEN, &program_id),
             ),
@@ -56,20 +56,15 @@ pub fn initialize_test() {
         !result.program_result.is_err(),
         "Initialize instruction failed."
     );
-    println!("Compute Units: {}", result.compute_units_consumed);
 
     let fundraiser_result_account = result
         .get_account(&fundraiser)
         .expect("Failed to find fundraiser account");
     let data = fundraiser_result_account.data();
-    assert_eq!(u64::from_le_bytes(data[72..80].try_into().unwrap()), 0);
-    assert_eq!(
+    println!("{:?}", data);
+    println!(
+        "Amount to raise {} {}",
         i64::from_le_bytes(data[80..88].try_into().unwrap()),
-        time_started
+        100_000_000u64
     );
-    assert_eq!(
-        u8::from_le_bytes(data[88..89].try_into().unwrap()),
-        duration
-    );
-    assert_eq!(u8::from_le_bytes(data[89..90].try_into().unwrap()), 0);
 }

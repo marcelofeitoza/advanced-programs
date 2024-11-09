@@ -1,24 +1,25 @@
 use pinocchio::account_info::AccountInfo;
 use pinocchio::program_error::ProgramError;
 use pinocchio::pubkey::Pubkey;
+use pinocchio::ProgramResult;
 
 pub struct Fundraiser(*mut u8);
 
 impl Fundraiser {
-    // Total = 32 + 32 + 8 + 8 + 8 + 1 + 1 = 90
-    pub const LEN: usize = 32 // maker
+    // Total = 8 + 8 + 32 + 32 + 8 + 1 + 1 = 90
+    pub const LEN: usize = 8 // current_amount
+        + 8  // time_started
+        + 32 // maker
         + 32 // mint_to_raise
         + 8  // amount_to_raise
-        + 8  // current_amount
-        + 8  // time_started
         + 1  // duration
         + 1; // bump
 
-    // #[inline(always)]
-    // pub fn init(&mut self, data: &[u8; Self::LEN]) -> ProgramResult {
-    //     unsafe { *(self.0 as *mut [u8; Self::LEN]) = *data };
-    //     Ok(())
-    // }
+    #[inline(always)]
+    pub fn init(&self, data: &[u8; Self::LEN]) -> ProgramResult {
+        unsafe { *(self.0 as *mut [u8; Self::LEN]) = *data };
+        Ok(())
+    }
 
     #[inline(always)]
     pub fn from_account_info_unchecked(account_info: &AccountInfo) -> Self {
