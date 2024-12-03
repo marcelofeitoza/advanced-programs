@@ -1,3 +1,12 @@
+use mollusk_svm::Mollusk;
+use solana_sdk::{
+    account::{AccountSharedData, WritableAccount},
+    program_option::COption,
+    program_pack::Pack,
+    pubkey::Pubkey,
+};
+use spl_token::state::AccountState;
+
 #[cfg(test)]
 mod check_test;
 #[cfg(test)]
@@ -7,19 +16,13 @@ mod initalize_test;
 #[cfg(test)]
 mod refund_test;
 
-use mollusk_svm::Mollusk;
-use solana_sdk::account::{AccountSharedData, WritableAccount};
-use solana_sdk::program_option::COption;
-use solana_sdk::program_pack::Pack;
-use solana_sdk::pubkey::Pubkey;
-use spl_token::state::AccountState;
-
 pub fn setup() -> (Pubkey, Mollusk) {
     let program_id = Pubkey::new_from_array(five8_const::decode_32_const(
-        "22222222222222222222222222222222222222222222",
+        "99999999999999999999999999999999999999999999",
     ));
     let mut mollusk = Mollusk::new(&program_id, "../target/deploy/fundraiser");
     mollusk_token::token::add_program(&mut mollusk);
+
     (program_id, mollusk)
 }
 

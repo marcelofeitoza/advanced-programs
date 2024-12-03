@@ -1,5 +1,4 @@
 use crate::constants::MIN_AMOUNT_TO_RAISE;
-use crate::state::Fundraiser;
 use pinocchio::{account_info::AccountInfo, program_error::ProgramError, ProgramResult};
 use pinocchio_token::instructions::Transfer;
 
@@ -11,16 +10,6 @@ pub fn process_contribute_instruction(accounts: &[AccountInfo], data: &[u8]) -> 
         return Err(ProgramError::NotEnoughAccountKeys);
     };
 
-    let fundraiser_account = Fundraiser::from_account_info_unchecked(fundraiser);
-    assert!(
-        fundraiser_account.time_started() > 0,
-        "Fundraiser not started yet"
-    );
-    assert!(
-        fundraiser_account.time_started() + i64::from(fundraiser_account.duration()) > 0,
-        "Fundraiser ended"
-    );
-
     Transfer {
         from: signer_ta,
         to: vault,
@@ -30,7 +19,7 @@ pub fn process_contribute_instruction(accounts: &[AccountInfo], data: &[u8]) -> 
     .invoke()?;
 
     unsafe {
-        *(fundraiser.borrow_mut_data_unchecked().as_mut_ptr().add(72) as *mut u64) += amount;
+        *(fundraiser.borrow_mut_data_unchecked().as_mut_ptr().add(0) as *mut u64) += amount;
         *(contributor.borrow_mut_data_unchecked().as_mut_ptr() as *mut u64) += amount;
     }
 

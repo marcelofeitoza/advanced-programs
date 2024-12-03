@@ -1,16 +1,17 @@
 [workspace]
 resolver = "2"
-members = [
-    "fundraiser",
-]
+members = ["fundraiser"]
+exclude = ["sbpf_close"]
 
 [workspace.package]
 authors = ["Advanced programs"]
 repository = "https://github.com/marcelofeitoza/advanced-programs"
 
 [workspace.dependencies]
-mollusk-svm = { path = "../mollusk/harness" } # { git = "https://github.com/deanmlittle/mollusk" }
-mollusk-token = { path = "../mollusk/programs/token" } # { git = "https://github.com/deanmlittle/mollusk" }
+mollusk-svm = { path = "../mollusk/harness" }
+# mollusk-svm = { git = "https://github.com/deanmlittle/mollusk" }
+mollusk-token = { path = "../mollusk/programs/token" }
+# mollusk-token = { git = "https://github.com/deanmlittle/mollusk" }
 bytemuck = "1.19.0"
 five8_const = "0.1.3"
 pinocchio = { git = "https://github.com/L0STE/pinocchio", branch = "spl-token" }

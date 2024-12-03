@@ -1,11 +1,16 @@
 use crate::state::Fundraiser;
 use pinocchio::{account_info::AccountInfo, program_error::ProgramError, signer, ProgramResult};
-use pinocchio_token::instructions::Transfer;
+use pinocchio_token::{instructions::Transfer, ID};
 
 pub fn process_check_instruction(accounts: &[AccountInfo]) -> ProgramResult {
     let [signer, signer_ta, fundraiser, vault, _token_program] = accounts else {
         return Err(ProgramError::NotEnoughAccountKeys);
     };
+    assert_eq!(
+        *vault.owner(),
+        ID,
+        "Vault account owner is not Token program"
+    );
 
     let fundraiser_account = Fundraiser::from_account_info(fundraiser)?;
     let bump = fundraiser_account.bump();
@@ -19,7 +24,5 @@ pub fn process_check_instruction(accounts: &[AccountInfo]) -> ProgramResult {
         authority: fundraiser,
         amount: fundraiser_account.current_amount(),
     }
-    .invoke_signed(&[signer!(fundraiser_seed, signer_key_seed, bump_seed)])?;
-
-    Ok(())
+    .invoke_signed(&[signer!(fundraiser_seed, signer_key_seed, bump_seed)])
 }

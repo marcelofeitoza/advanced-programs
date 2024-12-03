@@ -1,7 +1,5 @@
 use crate::state::{Contributor, Fundraiser};
-use pinocchio::account_info::AccountInfo;
-use pinocchio::program_error::ProgramError;
-use pinocchio::{signer, ProgramResult};
+use pinocchio::{account_info::AccountInfo, msg, program_error::ProgramError, signer, ProgramResult};
 use pinocchio_token::instructions::Transfer;
 
 pub fn process_refund_instruction(accounts: &[AccountInfo]) -> ProgramResult {
@@ -11,6 +9,9 @@ pub fn process_refund_instruction(accounts: &[AccountInfo]) -> ProgramResult {
 
     let fundraiser_account = Fundraiser::from_account_info(fundraiser)?;
     let contributor_account = Contributor::from_account_info(contributor_account)?;
+
+    msg!("Contributor account amount: {}", contributor_account.amount());
+
     assert!(contributor_account.amount() > 0, "No amount to refund");
 
     let maker = fundraiser_account.maker();

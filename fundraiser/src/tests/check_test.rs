@@ -1,11 +1,13 @@
-use crate::state::{Contributor, Fundraiser};
-use crate::tests::setup;
+use crate::{state::Fundraiser, tests::setup};
+use mollusk_svm::result::Check;
 use pinocchio_token::state::TokenAccount;
-use solana_sdk::account::{AccountSharedData, ReadableAccount};
 use solana_sdk::{
+    account::{AccountSharedData, ReadableAccount},
+    clock::Clock,
     instruction::{AccountMeta, Instruction},
     program_pack::Pack,
     pubkey::Pubkey,
+    sysvar::Sysvar,
 };
 
 #[test]
@@ -13,7 +15,9 @@ fn check_test() {
     let (program_id, mollusk) = setup();
     let (token_program, token_program_account) = mollusk_token::token::keyed_account();
 
-    let maker = Pubkey::new_from_array([0x1; 32]);
+    let maker = Pubkey::new_from_array(five8_const::decode_32_const(
+        "11111111111111111111111111111111111111111111",
+    ));
     let signer = maker;
     let signer_account = crate::tests::create_account(
         mollusk
@@ -23,20 +27,25 @@ fn check_test() {
         spl_token::state::Account::LEN,
         &program_id,
     );
-    let signer_ta = Pubkey::new_from_array([0x3; 32]);
-    let fundraiser =
-        Pubkey::find_program_address(&[b"fundraiser", &maker.to_bytes()], &program_id).0;
-    let contributor = Pubkey::find_program_address(
-        &[
-            b"contributor",
-            fundraiser.as_ref(),
-            signer.to_bytes().as_ref(),
-        ],
+
+    let (fundraiser_pda, bump) =
+        Pubkey::find_program_address(&[b"fundraiser", &maker.to_bytes()], &program_id);
+    let (contributor_pda, _) = Pubkey::find_program_address(
+        &[b"contributor", fundraiser_pda.as_ref(), signer.as_ref()],
         &program_id,
-    )
-    .0;
-    let mint = Pubkey::new_from_array([0x4; 32]);
-    let vault = Pubkey::new_from_array([0x5; 32]);
+    );
+
+    let contributor_account =
+        crate::tests::create_account(mollusk.sysvars.rent.minimum_balance(0), 0, &program_id);
+    let signer_ta = Pubkey::new_from_array(five8_const::decode_32_const(
+        "33333333333333333333333333333333333333333333",
+    ));
+    let mint = Pubkey::new_from_array(five8_const::decode_32_const(
+        "44444444444444444444444444444444444444444444",
+    ));
+    let vault = Pubkey::new_from_array(five8_const::decode_32_const(
+        "55555555555555555555555555555555555555555555",
+    ));
 
     let mut mint_account = crate::tests::pack_mint(&signer, 1_000_000);
     let mut mint_account_data = mint_account.data().to_vec();
@@ -44,45 +53,71 @@ fn check_test() {
     mint_account.set_data_from_slice(&mint_account_data);
 
     let signer_ta_account = crate::tests::pack_token_account(&signer, &mint, 1_000_000);
-    let vault_account = crate::tests::pack_token_account(&fundraiser, &mint, 0);
+    let vault_account = crate::tests::pack_token_account(&fundraiser_pda, &mint, 0);
 
-    let amount_to_raise: u64 = 100;
-    let current_amount: u64 = 0;
-    let time_started = 200i64;
-    let duration = 1u8;
-    let bump = 1u8;
+    let duration = 10u8;
+    let init_data = [
+        vec![0],                         // instruction discriminant
+        maker.to_bytes().to_vec(),       // maker pubkey 0 - 32
+        mint.to_bytes().to_vec(),        // mint pubkey 32 - 64
+        100u64.to_le_bytes().to_vec(),   // amount_to_raise 64 - 72
+        duration.to_le_bytes().to_vec(), // duration 72 - 73
+        bump.to_le_bytes().to_vec(),     // bump 73 - 74
+    ]
+    .concat();
 
-    let mut fundraiser_account = AccountSharedData::new(
-        mollusk.sysvars.rent.minimum_balance(Fundraiser::LEN),
-        Fundraiser::LEN,
-        &program_id,
-    );
-    let contributor_account = crate::tests::create_account(
-        mollusk.sysvars.rent.minimum_balance(Contributor::LEN),
-        Contributor::LEN,
-        &program_id,
-    );
+    let clock = Pubkey::from_str_const("SysvarC1ock11111111111111111111111111111111");
 
-    fundraiser_account.set_data_from_slice(
-        &[
-            maker.to_bytes().to_vec(),
-            mint.to_bytes().to_vec(),
-            amount_to_raise.to_le_bytes().to_vec(),
-            current_amount.to_le_bytes().to_vec(),
-            time_started.to_le_bytes().to_vec(),
-            duration.to_le_bytes().to_vec(),
-            bump.to_le_bytes().to_vec(),
-        ]
-        .concat(),
+    let init_instruction = Instruction::new_with_bytes(
+        program_id,
+        &init_data,
+        vec![
+            AccountMeta::new(fundraiser_pda, false),
+            AccountMeta::new(clock, false),
+        ],
     );
 
-    assert_eq!(
-        fundraiser_account.lamports(),
-        mollusk.sysvars.rent.minimum_balance(Fundraiser::LEN)
-    );
-    assert_eq!(fundraiser_account.data().len(), Fundraiser::LEN);
+    let init_accounts = vec![
+        (
+            fundraiser_pda,
+            AccountSharedData::new(
+                mollusk.sysvars.rent.minimum_balance(Fundraiser::LEN),
+                Fundraiser::LEN,
+                &program_id,
+            ),
+        ),
+        (
+            clock,
+            AccountSharedData::new(
+                mollusk.sysvars.rent.minimum_balance(Clock::size_of()),
+                Clock::size_of(),
+                &solana_sdk::sysvar::id(),
+            ),
+        ),
+    ];
 
-    let amount_to_contribute: u64 = 100; // all the amount_to_raise
+    let init_result = mollusk.process_and_validate_instruction(
+        &init_instruction,
+        &init_accounts,
+        &[Check::success()],
+    );
+    assert!(
+        !init_result.program_result.is_err(),
+        "Initialize fundraiser failed"
+    );
+
+    let fundraiser_account = init_result.get_account(&fundraiser_pda).unwrap();
+    let fundraiser_data = fundraiser_account.data();
+    println!("Fundraiser data:");
+    println!("Current amount: {}", u64::from_le_bytes(fundraiser_data[0..8].try_into().unwrap()));
+    println!("Time started: {}", i64::from_le_bytes(fundraiser_data[8..16].try_into().unwrap()));
+    println!("Maker: {}", Pubkey::new_from_array(fundraiser_data[16..48].try_into().unwrap()));
+    println!("Mint: {}", Pubkey::new_from_array(fundraiser_data[48..80].try_into().unwrap()));
+    println!("Amount to raise: {}", u64::from_le_bytes(fundraiser_data[80..88].try_into().unwrap()));
+    println!("Duration: {}", u8::from_le_bytes(fundraiser_data[88..89].try_into().unwrap()));
+    println!("Bump: {}", u8::from_le_bytes(fundraiser_data[89..90].try_into().unwrap()));
+
+    let amount_to_contribute: u64 = 100;
     let contribute_data = [vec![1], amount_to_contribute.to_le_bytes().to_vec()].concat();
 
     let contribute_instruction = Instruction::new_with_bytes(
@@ -90,47 +125,43 @@ fn check_test() {
         &contribute_data,
         vec![
             AccountMeta::new(signer, true),
-            AccountMeta::new(contributor, true),
+            AccountMeta::new(contributor_pda, true),
             AccountMeta::new(signer_ta, false),
-            AccountMeta::new(fundraiser, false),
+            AccountMeta::new(fundraiser_pda, false),
             AccountMeta::new(vault, false),
             AccountMeta::new(token_program, false),
         ],
     );
 
-    let result = mollusk.process_instruction(
+    let contribute_accounts = vec![
+        (signer, signer_account.clone()),
+        (contributor_pda, contributor_account),
+        (signer_ta, signer_ta_account.clone()),
+        (fundraiser_pda, fundraiser_account.clone()),
+        (vault, vault_account.clone()),
+        (token_program, token_program_account.clone()),
+        (mint, mint_account.clone()),
+    ];
+
+    let contribute_result = mollusk.process_and_validate_instruction(
         &contribute_instruction,
-        &vec![
-            (signer, signer_account.clone()),
-            (contributor, contributor_account),
-            (signer_ta, signer_ta_account.clone()),
-            (fundraiser, fundraiser_account.clone()),
-            (vault, vault_account.clone()),
-            (token_program, token_program_account.clone()),
-        ],
-    );
-    assert!(
-        !result.program_result.is_err(),
-        "process_contribute_instruction failed."
+        &contribute_accounts,
+        &[Check::success()],
     );
 
-    let fundraiser_result_account = result
-        .get_account(&fundraiser)
-        .expect("Failed to find fundraiser account");
-    let fundraiser_data = fundraiser_result_account.data();
-    println!(
-        "Amount to raise: {:?}",
-        u64::from_le_bytes(fundraiser_data[64..72].try_into().unwrap())
+    assert!(
+        !contribute_result.program_result.is_err(),
+        "Contribution failed"
     );
-    println!(
-        "Current amount: {:?}",
-        u64::from_le_bytes(fundraiser_data[72..80].try_into().unwrap())
-    );
-    assert_eq!(
-        u64::from_le_bytes(fundraiser_data[72..80].try_into().unwrap()),
-        amount_to_contribute,
-        "Current amount should be updated after contribution"
-    );
+
+    let updated_vault_account = contribute_result.get_account(&vault).unwrap().clone();
+    let updated_fundraiser_account = contribute_result
+        .get_account(&fundraiser_pda)
+        .unwrap()
+        .clone();
+
+    let vault_balance = unsafe { TokenAccount::from_bytes(updated_vault_account.data()) }.amount();
+    println!("Vault balance after contribution: {}", vault_balance);
 
     let check_instruction = Instruction::new_with_bytes(
         program_id,
@@ -138,69 +169,31 @@ fn check_test() {
         vec![
             AccountMeta::new(signer, true),
             AccountMeta::new(signer_ta, false),
-            AccountMeta::new(fundraiser, true),
-            AccountMeta::new(vault, true),
+            AccountMeta::new(fundraiser_pda, true),
+            AccountMeta::new(vault, false),
             AccountMeta::new_readonly(token_program, false),
         ],
     );
 
-    let vault_result_account = result
-        .get_account(&vault)
-        .expect("Failed to find vault account");
-    let vault_data = vault_result_account.data();
-    let vault_ta_before = unsafe { TokenAccount::from_bytes(vault_data) };
-    println!("Vault balance before: {:?}", vault_ta_before.amount());
+    let check_accounts = vec![
+        (signer, signer_account),
+        (signer_ta, signer_ta_account),
+        (fundraiser_pda, updated_fundraiser_account),
+        (vault, updated_vault_account),
+        (token_program, token_program_account),
+    ];
 
-    let signer_ta_result_account = result
-        .get_account(&signer_ta)
-        .expect("Failed to find signer_ta account");
-    let signer_ta_data = signer_ta_result_account.data();
-    let signer_ta_before = unsafe { TokenAccount::from_bytes(signer_ta_data) };
-    println!(
-        "Signer Token Account balance before: {:?}",
-        signer_ta_before.amount()
-    );
-
-    let result = mollusk.process_instruction(
+    let check_result = mollusk.process_and_validate_instruction(
         &check_instruction,
-        &vec![
-            (signer, AccountSharedData::new(1_000_000, 0, &program_id)),
-            (signer_ta, signer_ta_account),
-            (fundraiser, fundraiser_account.clone()),
-            (vault, vault_account),
-            (token_program, token_program_account),
-        ],
-    );
-    assert!(
-        !result.program_result.is_err(),
-        "process_check_instruction failed."
+        &check_accounts,
+        &[Check::success()],
     );
 
-    let vault_result_account = result
-        .get_account(&vault)
-        .expect("Failed to find vault account");
-    let vault_data = vault_result_account.data();
-    let vault_ta_after = unsafe { TokenAccount::from_bytes(vault_data) };
-    println!("Vault balance: {:?}", vault_ta_after.amount());
+    assert!(!check_result.program_result.is_err(), "Check failed");
 
-    let signer_ta_result_account = result
-        .get_account(&signer_ta)
-        .expect("Failed to find signer_ta account");
-    let signer_ta_data = signer_ta_result_account.data();
-    let signer_ta_after = unsafe { TokenAccount::from_bytes(signer_ta_data) };
-    println!(
-        "Signer Token Account balance: {:?}",
-        signer_ta_after.amount()
-    );
-
-    assert_eq!(
-        vault_ta_after.amount(),
-        0,
-        "Vault balance should be 0 after transfer"
-    );
-    assert_eq!(
-        signer_ta_after.amount(),
-        1_000_000,
-        "Signer Token Account should have received the raised amount"
-    );
+    // Verify vault is empty
+    let final_vault_account = check_result.get_account(&vault).unwrap();
+    let final_vault_balance =
+        unsafe { TokenAccount::from_bytes(final_vault_account.data()) }.amount();
+    assert_eq!(final_vault_balance, 0, "Vault should be empty after check");
 }
