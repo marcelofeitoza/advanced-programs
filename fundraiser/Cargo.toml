@@ -8,9 +8,8 @@ crate-type = ["cdylib", "lib"]
 
 [dependencies]
 pinocchio = { workspace = true }
-pinocchio-system = { workspace = true}
-pinocchio-token = { workspace = true}
-bytemuck = { workspace = true }
+pinocchio-system = { workspace = true }
+pinocchio-token = { workspace = true }
 five8_const = { workspace = true }
 
 [dev-dependencies]

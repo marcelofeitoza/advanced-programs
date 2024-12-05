@@ -1,14 +1,5 @@
-use solana_program::{
-    account_info::AccountInfo, entrypoint::ProgramResult, program_error::ProgramError,
-    pubkey::Pubkey,
-};
+use pinocchio::{account_info::AccountInfo, ProgramResult};
 
-use crate::processor::EscrowArgs;
-
-pub fn refund(program_id: &Pubkey, accounts: &[AccountInfo], args: EscrowArgs) -> ProgramResult {
-    let [maker, mint_a, mint_b] = accounts else {
-        return Err(ProgramError::NotEnoughAccountKeys);
-    };
-
+pub fn process(accounts: &[AccountInfo], bump: [u8; 1]) -> ProgramResult {
     Ok(())
 }
