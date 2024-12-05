@@ -830,6 +830,20 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5443807d6dff69373d433ab9ef5378ad8df50ca6298caf15de6e52e24aaf54d5"
 
 [[package]]
+name = "escrow"
+version = "0.1.0"
+dependencies = [
+ "five8_const",
+ "mollusk-svm",
+ "mollusk-token",
+ "pinocchio",
+ "pinocchio-system",
+ "pinocchio-token",
+ "solana-sdk",
+ "spl-token",
+]
+
+[[package]]
 name = "feature-probe"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -885,7 +899,6 @@ dependencies = [
 name = "fundraiser"
 version = "0.1.0"
 dependencies = [
- "bytemuck",
  "five8_const",
  "mollusk-svm",
  "mollusk-token",
@@ -1514,6 +1527,7 @@ dependencies = [
 [[package]]
 name = "mollusk-svm"
 version = "0.0.6"
+source = "git+https://github.com/deanmlittle/mollusk#e57998bc4ebf08ed6d43358c6c28d154ca3e081c"
 dependencies = [
  "bincode",
  "solana-bpf-loader-program",
@@ -1522,13 +1536,13 @@ dependencies = [
  "solana-program-runtime",
  "solana-sdk",
  "solana-system-program",
- "solana-timings",
  "thiserror",
 ]
 
 [[package]]
 name = "mollusk-token"
 version = "0.1.0"
+source = "git+https://github.com/deanmlittle/mollusk#e57998bc4ebf08ed6d43358c6c28d154ca3e081c"
 dependencies = [
  "mollusk-svm",
  "solana-sdk",
@@ -1741,12 +1755,12 @@ checksum = "8b870d8c151b6f2fb93e84a13146138f05d02ed11c7e7c54f8826aaaf7c9f184"
 [[package]]
 name = "pinocchio"
 version = "0.6.0"
-source = "git+https://github.com/L0STE/pinocchio?branch=spl-token#50341d60e5da901d41682db7b794fe48066c0bcd"
+source = "git+https://github.com/L0STE/pinocchio/?branch=spl-token#50341d60e5da901d41682db7b794fe48066c0bcd"
 
 [[package]]
 name = "pinocchio-pubkey"
 version = "0.2.1"
-source = "git+https://github.com/L0STE/pinocchio?branch=spl-token#50341d60e5da901d41682db7b794fe48066c0bcd"
+source = "git+https://github.com/L0STE/pinocchio/?branch=spl-token#50341d60e5da901d41682db7b794fe48066c0bcd"
 dependencies = [
  "five8_const",
  "pinocchio",
@@ -1755,7 +1769,7 @@ dependencies = [
 [[package]]
 name = "pinocchio-system"
 version = "0.2.0"
-source = "git+https://github.com/L0STE/pinocchio?branch=spl-token#50341d60e5da901d41682db7b794fe48066c0bcd"
+source = "git+https://github.com/L0STE/pinocchio/?branch=spl-token#50341d60e5da901d41682db7b794fe48066c0bcd"
 dependencies = [
  "pinocchio",
  "pinocchio-pubkey",
@@ -1764,7 +1778,7 @@ dependencies = [
 [[package]]
 name = "pinocchio-token"
 version = "0.1.0"
-source = "git+https://github.com/L0STE/pinocchio?branch=spl-token#50341d60e5da901d41682db7b794fe48066c0bcd"
+source = "git+https://github.com/L0STE/pinocchio/?branch=spl-token#50341d60e5da901d41682db7b794fe48066c0bcd"
 dependencies = [
  "pinocchio",
  "pinocchio-pubkey",
